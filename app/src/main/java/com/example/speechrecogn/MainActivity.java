@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResults(Bundle bundle) {
                 ArrayList<String> list1 = bundle.getStringArrayList(speechRecognizer.RESULTS_RECOGNITION);
-
                 for (String str : list1) {
                     viewText.setText(str);
 
