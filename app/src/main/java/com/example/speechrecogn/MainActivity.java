@@ -1,6 +1,9 @@
+
+
 package com.example.speechrecogn;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -9,6 +12,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -26,6 +30,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.regex.Pattern;
+import java.util.stream.*;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
     private String text;
 
 
-
     private ArrayList<String> list = new ArrayList<>();
 
     public ArrayList<String> getList() {
@@ -64,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         okButton = findViewById(R.id.button2);
         viewText = findViewById(R.id.viewtext);
         editText = findViewById(R.id.edittext2);
-
 
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -94,9 +101,11 @@ public class MainActivity extends AppCompatActivity {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String text = editText.getText().toString();
 
-                list.add(editText.getText().toString());
-                new ProgressTask().execute();
+                    list.add(text);
+
+                    new ProgressTask().execute();
             }
         });
 
@@ -158,16 +167,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private StringBuilder parseResult(String str) {
+    private StringBuilder parseResultForCode(String str) {
         String[] strComma = str.split(",");
         StringBuilder stringBuilder = new StringBuilder();
         ;
         for (int i = 0; i < strComma.length; i++) {
             String[] strColon = strComma[i].split(":");
-            for (int j = 0; j < strColon.length/2; j++) {
-                if (strColon.length % 2 == 0 && j<= strColon.length-1) {
-                    stringBuilder.append("\""+strColon[0]+"\"" + ":");
-                    stringBuilder.append("\""+strColon[1]+"\"");
+            for (int j = 0; j < strColon.length / 2; j++) {
+                if (strColon.length % 2 == 0 && j <= strColon.length - 1) {
+                    stringBuilder.append("\"" + strColon[0] + "\"" + ":");
+                    stringBuilder.append("\"" + strColon[1] + "\"");
                     if (i != strColon.length - 1) {
                         stringBuilder.append("," + "\n");
                     }
@@ -192,15 +201,72 @@ public class MainActivity extends AppCompatActivity {
 
     private class ProgressTask extends AsyncTask<String, Void, String> {
 
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         protected String doInBackground(String... strings) {
-            if (getList() != null) {
+            ArrayList<String> inputTextList = getList();
+            String stringHard = new String();
+            StringBuilder str = new StringBuilder();
+            if (inputTextList != null) {
+                if (inputTextList.toString().contains(":")) {
+                    str = parseResultForCode(getList().toString());
 
-                StringBuilder str = parseResult(getList().toString());
+                } else {
+                    Dictionary dictionary = new Dictionary();
+                    HashMap<String, String> dictMap = dictionary.getDictMap();
 
-                String body = "{" + str + "}";
+                    String[] inputText = inputTextList.toString().toLowerCase(Locale.ROOT).split(",");
+
+                    for (int i = 0; i <inputText.length ; i++) {
+                        for (String element : dictMap.keySet()){
+                            if (inputText[i].contains(element) || Pattern.compile(element).matcher(inputText[i]).find()){
+                                if (i==0){
+                                    str.append("\"" + dictMap.get(element) + "\"" + ":" + "\"" + inputText[i].substring(1)+"\"" );
+                                } else {
+                                    str.append("\"" + dictMap.get(element) + "\"" + ":" + "\"" + inputText[i]+"\"" );
+                                }
+
+
+                                if (i != inputText.length - 1) {
+                                    str.append("," + "\n");
+                                }
+
+                            }
+
+                        }
+
+                        stringHard= str.substring(0, str.length()-2);
+                    }
+
+                    System.out.println("121: " + str.substring(0, str.length()-2));
+                    System.out.println("strr: " + str);
+
+
+/*                    dictMap.entrySet().forEach(k -> {
+                        if (Arrays.asList(inputText).contains(k.getKey())) {
+                            stringBuilder.append(k.getValue()+" ");
+
+                        }
+                        String[] next = Arrays.toString(inputText).split(" ");
+                        next[0] = next[0].substring(1);
+                        next[next.length-1] = next[next.length-1].substring(0, next[next.length-1].length()-1);
+                        for (int i = 0; i <next.length ; i++) {
+                            if (next[i].contains(k.getKey())){
+                                stringBuilder.append(next[i]).append(":").append(next[i + 1]).append(" ");
+                            }
+                        }
+                    });*/
+                }
+                String body;
+                if(!stringHard.isEmpty()){
+                    body = "{" + stringHard + "}";
+                } else {
+                    body = "{" + str + "}";
+                }
+
                 System.out.println("JSON" + body);
                 sendPostRequest("http://localhost:8080/test", body);
+
             }
             return null;
         }

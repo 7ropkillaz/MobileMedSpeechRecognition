@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/kusai/AndroidStudioProjects/MobileMedSpeechRecognition/app/src/main/res/layout-w1240dp/activity_login.xml" value="0.12081659973226239" />
+        <entry key="..\:/Users/kusai/AndroidStudioProjects/MobileMedSpeechRecognition/app/src/main/res/layout-w936dp/activity_login.xml" value="0.141015625" />
+        <entry key="..\:/Users/kusai/AndroidStudioProjects/MobileMedSpeechRecognition/app/src/main/res/layout/activity_login.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/kusai/AndroidStudioProjects/MobileMedSpeechRecognition/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/kusai/AndroidStudioProjects/MobileMedSpeechRecognition/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
         <entry key="..\:/Users/kusai/AndroidStudioProjects/SpeechRecogn/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.223" />
         <entry key="..\:/Users/kusai/AndroidStudioProjects/SpeechRecogn/app/src/main/res/drawable/ic_baseline_mic_24.xml" value="0.29" />
         <entry key="..\:/Users/kusai/AndroidStudioProjects/SpeechRecogn/app/src/main/res/drawable/ic_baseline_mic_off_24.xml" value="0.223" />
